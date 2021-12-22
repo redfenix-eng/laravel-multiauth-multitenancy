@@ -11,6 +11,8 @@ class MakeMultiAuthCommand extends Command
     protected $name;
     protected $stub_path;
 
+    protected bool $inTenant = false;
+
     /**
      * The name and signature of the console command.
      *
@@ -164,37 +166,18 @@ class MakeMultiAuthCommand extends Command
 
     protected function registerRoutes()
     {
-        $provider_path = app_path('Providers/RouteServiceProvider.php');
+        $stub_path    = $this->stub_path . '/routes';
+        $name_map     = $this->parseName();
+        $publish_path = base_path('routes');
+        $guard        = $name_map['{{singularSlug}}'];
 
-        $provider = file_get_contents($provider_path);
-        $name_map = $this->parseName();
 
-        // Function
-        $stub = $this->stub_path . '/routes/map.stub';
+        $stub     = file_get_contents("{$stub_path}/require.stub");
+        $original = file_get_contents("{$publish_path}/web.php");
+        $complied = strtr($stub, $name_map);
+        file_put_contents("{$publish_path}/web.php", $original . $complied);
 
-        $map = file_get_contents($stub);
-        $map = strtr($map, $name_map);
-        if (strpos($provider, $map)) {
-            $this->error('Routes are already registered');
-
-            return;
-        }
-
-        $toReplace = '$this->routes(function () {';
-        $provider  = str_replace($toReplace, $toReplace . $map, $provider);
-        /********** Function Call **********/
-
-        $map_call = file_get_contents($this->stub_path . '/routes/map_call.stub');
-
-        $map_call = strtr($map_call, $name_map);
-
-        $map_call_bait = '$this->mapWebRoutes();';
-
-        $provider = str_replace($map_call_bait, $map_call_bait . $map_call, $provider);
-
-        // Overwrite config file
-        file_put_contents($provider_path, $provider);
-        $this->info("Step 4. Step 3 generated route file is registered in App\Provider\RouteServiceProvider.php \n");
+        $this->info("Step 4. Registered routes in routes/web.php \n");
 
         return $this;
     }
@@ -261,10 +244,10 @@ class MakeMultiAuthCommand extends Command
     {
         $stub_content = file_get_contents("{$this->stub_path}/model.stub");
         $compiled     = strtr($stub_content, $this->parseName());
-        $model_path   = app_path($this->parseName()['{{singularClass}}'] . '.php');
+        $model_path   = app_path("Models\\" . $this->parseName()['{{singularClass}}'] . '.php');
 
         file_put_contents($model_path, $compiled);
-        $this->info("Step 8. Model for {$this->name} is added to App\\{$this->name}.php \n");
+        $this->info("Step 8. Model for {$this->name} is added to App\\Models\\{$this->name}.php \n");
 
         return $this;
     }

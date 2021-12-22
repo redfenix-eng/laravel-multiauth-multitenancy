@@ -1,6 +1,6 @@
 <?php
 
-namespace {{namespace}};
+namespace {{namespace}}\Models;
 
 use {{namespace}}\Notifications\{{singularClass}}\{{singularClass}}ResetPassword;
 use {{namespace}}\Notifications\{{singularClass}}\{{singularClass}}VerifyEmail;

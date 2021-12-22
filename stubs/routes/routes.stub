@@ -1,6 +1,8 @@
 <?php
 
-Route::group(['namespace' => '{{singularClass}}'], function() {
+use Illuminate\Support\Facades\Route;
+
+Route::group(['namespace' => 'App\Http\Controllers\{{singularClass}}'], function() {
     Route::get('/', 'HomeController@index')->name('{{singularSlug}}.dashboard');
 
     // Login
