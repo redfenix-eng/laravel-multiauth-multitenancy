@@ -19,7 +19,8 @@ class MakeMultiAuthCommand extends Command
      * @var string
      */
     protected $signature = 'multiauth:make
-                                {name=student : Give a name for guard}';
+                                {name=student : Give a name for guard}
+                                {--tenant}';
 
     /**
      * The console command description.
@@ -47,6 +48,8 @@ class MakeMultiAuthCommand extends Command
     public function handle()
     {
         $this->name = $this->argument('name');
+        $this->isTenant = $this->option('tenant');
+
         if ($this->checkGuard()) {
             $this->error("Provider '{$this->name}' already exist");
 
@@ -140,12 +143,12 @@ class MakeMultiAuthCommand extends Command
     {
         $stub_path    = $this->stub_path . '/routes';
         $name_map     = $this->parseName();
-        $publish_path = base_path('routes');
+        $publish_path = $this->isTenant ? base_path('routes/tenant') : base_path('routes');
         $guard        = $name_map['{{singularSlug}}'];
 
         if (app()->environment() == 'testing') {
-            if (!file_exists(base_path('routes'))) {
-                mkdir(base_path('routes'));
+            if (!file_exists($publish_path)) {
+                mkdir($publish_path);
             }
         }
 

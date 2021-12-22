@@ -1,15 +1,11 @@
 <h1 align="center">Laravel Multi Auth</h1>
 
-<p align="center">
-    <a href="https://travis-ci.org/bitfumes/laravel-multiauth"><img src="https://travis-ci.org/bitfumes/laravel-multiauth.svg" alt="Build Status"></a>
-    <a href="https://github.styleci.io/repos/143331251"><img src="https://github.styleci.io/repos/143331251/shield?branch=master" alt="Build Status"></a>
-    <a href="https://github.com/bitfumes/laravel-multiauth/stargazers"><img src="https://img.shields.io/github/stars/bitfumes/laravel-multiauth.svg" alt="Github Start"></a>
-    <a href="https://packagist.org/packages/bitfumes/laravel-multiauth"><img src="https://poser.pugx.org/bitfumes/laravel-multiauth/d/total.svg" alt="Total Downloads"></a>
-    <a href="https://packagist.org/packages/bitfumes/laravel-multiauth"><img src="https://poser.pugx.org/bitfumes/laravel-multiauth/v/stable.svg" alt="Latest Version"></a>
-    <a href="https://packagist.org/packages/bitfumes/laravel-multiauth"><img src="https://poser.pugx.org/bitfumes/laravel-multiauth/license.svg" alt="License"></a>
-    <a href="https://github.com/bitfumes/laravel-multiauth/issues"><img src="https://img.shields.io/github/issues/bitfumes/laravel-multiauth.svg" alt="License"></a>
-  </p>
-  <p align="center">
+<p>Multi Auth and admin auth in Laravel Project with support for the Laravel 8 Models namespace convention & optional generation inside a tenant when using the multitenancy stancl/tenancy package</p>
+
+<br/>
+<h2 align="center">This is a fork of the original package</h2>
+<br/>
+
 
   <p align="center">
     <strong>For Complete Documentation, visit <a href="https://bitfumes.github.io/laravel-multiauth/">Here</a></strong>
