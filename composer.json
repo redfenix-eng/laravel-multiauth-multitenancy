@@ -16,12 +16,12 @@
   ],
   "authors": [
     {
-      "name": "sarthaksavvy",
-      "email": "sarthak@bitfumes.com"
-    },
-    {
       "name": "Toby Selway",
       "email": "tobyselway@redfenix.pt"
+    },
+    {
+      "name": "sarthaksavvy",
+      "email": "sarthak@bitfumes.com"
     }
   ],
   "minimum-stability": "dev",
