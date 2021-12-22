@@ -109,7 +109,7 @@ class MakeMultiAuthCommand extends Command
 
     protected function publishControllers()
     {
-        $stub_path = $this->stub_path . '/Controllers';
+        $stub_path = $this->stub_path . ($this->isTenant ? '/Controllers-tenancy' : '/Controllers');
         $name_map  = $this->parseName();
         $guard     = $name_map['{{singularClass}}'];
 
@@ -122,9 +122,9 @@ class MakeMultiAuthCommand extends Command
             'HomeController',
         ];
 
-        $publish_path = app_path("/Http/Controllers/{$guard}");
+        $publish_path = $this->isTenant ? app_path("/Http/Controllers/Tenant/{$guard}") : app_path("/Http/Controllers/{$guard}");
 
-        if (!is_dir($publish_path)) {
+        if(!is_dir($publish_path)) {
             mkdir($publish_path, 0755, true);
             mkdir("{$publish_path}/Auth", 0755, true);
         }
@@ -134,7 +134,8 @@ class MakeMultiAuthCommand extends Command
             $complied = strtr($stub, $name_map);
             file_put_contents("{$publish_path}/{$file}.php", $complied);
         }
-        $this->info("Step 2. New Controllers for {$guard} is added to App\Http\Controller\{$guard} \n");
+        $path = $this->isTenant ? "App\\Http\\Controller\\Tenant\\" : "App\\Http\\Controller\\";
+        $this->info("Step 2. New Controllers for {$guard} is added to {$path}{$guard} \n");
 
         return $this;
     }
@@ -146,10 +147,8 @@ class MakeMultiAuthCommand extends Command
         $publish_path = $this->isTenant ? base_path('routes/tenant') : base_path('routes');
         $guard        = $name_map['{{singularSlug}}'];
 
-        if (app()->environment() == 'testing') {
-            if (!file_exists($publish_path)) {
-                mkdir($publish_path);
-            }
+        if (!file_exists($publish_path)) {
+            mkdir($publish_path, 0777, true);
         }
 
         if (file_exists("{$publish_path}/{$guard}.php")) {
@@ -159,10 +158,12 @@ class MakeMultiAuthCommand extends Command
             }
         }
 
-        $stub     = file_get_contents("{$stub_path}/routes.stub");
+        $stubFile = $this->isTenant ? "routes-tenancy.stub" : "routes.stub";
+        $stub     = file_get_contents("{$stub_path}/{$stubFile}");
         $complied = strtr($stub, $name_map);
         file_put_contents("{$publish_path}/{$guard}.php", $complied);
-        $this->info("Step 3. Routes for {$guard} is added to routes/{$guard}.php file \n");
+        $path = $this->isTenant ? "routes/tenant/{$guard}.php" : "routes/{$guard}.php";
+        $this->info("Step 3. Routes for {$guard} is added to {$path} file \n");
 
         return $this;
     }
@@ -174,13 +175,13 @@ class MakeMultiAuthCommand extends Command
         $publish_path = base_path('routes');
         $guard        = $name_map['{{singularSlug}}'];
 
-
-        $stub     = file_get_contents("{$stub_path}/require.stub");
-        $original = file_get_contents("{$publish_path}/web.php");
+        $outFile = $this->isTenant ? "tenant.php" : "web.php";
+        $stub     = file_get_contents($this->isTenant ? "{$stub_path}/require-tenancy.stub" : "{$stub_path}/require.stub");
+        $original = file_get_contents("{$publish_path}/{$outFile}");
         $complied = strtr($stub, $name_map);
-        file_put_contents("{$publish_path}/web.php", $original . $complied);
+        file_put_contents("{$publish_path}/{$outFile}", $original . $complied);
 
-        $this->info("Step 4. Registered routes in routes/web.php \n");
+        $this->info("Step 4. Registered routes in routes/{$outFile} \n");
 
         return $this;
     }
@@ -189,8 +190,9 @@ class MakeMultiAuthCommand extends Command
     {
         $guard = $this->parseName()['{{singularSlug}}'];
 
-        $views_path = resource_path('views/' . $guard);
-        $stub_path  = "{$this->stub_path}/views";
+        $path = $this->isTenant ? "views/tenant/" : "views/";
+        $views_path = resource_path($path . $guard);
+        $stub_path  = $this->isTenant ? "{$this->stub_path}/views-tenancy" : "{$this->stub_path}/views";
         $views      = [
             'home.blade',
             'layouts/app.blade',
@@ -210,7 +212,8 @@ class MakeMultiAuthCommand extends Command
             }
             file_put_contents("{$views_path}/{$view}.php", $complied);
         }
-        $this->info("Step 5. Views are added to resources\\views\{$guard} directory \n");
+        $path = $this->isTenant ? "resources\\views\\tenant\\" : "resources\\views\\";
+        $this->info("Step 5. Views are added to {$path}{$guard} directory \n");
 
         return $this;
     }
@@ -233,12 +236,14 @@ class MakeMultiAuthCommand extends Command
     {
         $stub_content = file_get_contents("{$this->stub_path}/migration.stub");
 
+        $tenantDir = $this->isTenant ? "tenant/" : "";
         $compiled       = strtr($stub_content, $this->parseName());
         $signature      = date('Y_m_d_His');
-        $migration_path = database_path("migrations/{$signature}_create_{$this->parseName()['{{pluralSnake}}']}_table.php");
+        $migration_path = database_path("migrations/{$tenantDir}{$signature}_create_{$this->parseName()['{{pluralSnake}}']}_table.php");
 
         file_put_contents($migration_path, $compiled);
-        $this->info("Step 7. Migration for {$this->name} table schema is added to database\migrations \n");
+        $tenantDir = $this->isTenant ? "tenant\\" : "";
+        $this->info("Step 7. Migration for {$this->name} table schema is added to database\{$tenantDir}migrations \n");
 
         return $this;
     }

@@ -1,0 +1,13 @@
+
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+    CheckTenantForMaintenanceMode::class,
+])->group(function () {
+
+    Route::prefix('{{singularSlug}}')->group(function() {
+        require __DIR__ . '/tenant/{{singularSlug}}.php';
+    });
+
+});
